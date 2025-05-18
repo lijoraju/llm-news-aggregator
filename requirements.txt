@@ -1,13 +1,10 @@
 requests
 beautifulsoup4
-newspaper3k
 transformers
 torch
 sentence-transformers
 faiss-cpu
-streamlit
 scikit-learn
-flask
 tqdm
 python-dotenv
 pyyaml

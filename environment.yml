@@ -1,0 +1,21 @@
+name: llm-news
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - requests
+      - beautifulsoup4
+      - newspaper3k
+      - transformers
+      - torch
+      - sentence-transformers
+      - faiss-cpu
+      - streamlit
+      - scikit-learn
+      - flask
+      - tqdm
+      - python-dotenv
+      - pyyaml
