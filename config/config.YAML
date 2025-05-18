@@ -1,0 +1,15 @@
+news_sources:
+  - google_news
+  - bbc
+  - cnn
+
+categories:
+  - Technology
+  - Business
+  - Politics
+  - Sports
+  - Health
+  - Science
+
+summarization_model: "facebook/bart-large-cnn"
+vector_db: "faiss"

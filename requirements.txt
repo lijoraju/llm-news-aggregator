@@ -9,3 +9,5 @@ streamlit
 scikit-learn
 flask
 tqdm
+python-dotenv
+pyyaml
