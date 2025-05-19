@@ -2,38 +2,56 @@ import os
 from newsapi import NewsApiClient
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+import json
+from pathlib import Path
 
 load_dotenv()
 
 newsapi = NewsApiClient(api_key=os.getenv("NEWS_API_KEY"))
 
-def fetch_news(query="AI", from_days_ago=1, language='en', page_size=20):
+def save_articles(articles, output_path="../data/raw/newsapi_articles.json"):
+    Path("../data/raw").mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(articles, f, indent=2, ensure_ascii=False)
+
+def fetch_news(query="AI", from_days_ago=1, language='en', page_size=10, max_pages=3, save=False):
     from_date = (datetime.now() - timedelta(days=from_days_ago)).strftime('%Y-%m-%d')
+    all_articles = []
 
-    response = newsapi.get_everything(
-        q=query,
-        from_param=from_date,
-        language=language,
-        sort_by='relevancy',
-        page_size=page_size
-    )
+    for page in range(1, max_pages + 1):
+        try:
+            response = newsapi.get_everything(
+                q=query,
+                from_param=from_date,
+                language=language,
+                sort_by='relevancy',
+                page=page,
+                page_size=page_size
+            )
 
-    articles = response.get('articles', [])
-    cleaned_articles = []
+            articles = response.get('articles', [])
+            if not articles:
+                break
 
-    for article in articles:
-        cleaned_articles.append({
-            'title': article['title'],
-            'description': article['description'],
-            'url': article['url'],
-            'published_at': article['publishedAt'],
-            'source': article['source']['name'],
-            'content':article['content']
-        })
+            for article in articles:
+                all_articles.append({
+                    'title': article['title'],
+                    'description': article['description'],
+                    'url': article['url'],
+                    'published_at': article['publishedAt'],
+                    'source': article['source']['name'],
+                    'content':article['content']
+                })
+        except Exception as e:
+            print(f"Error on page {page}: {e}")
+    
+    if save:
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        with open(f"../data/raw/newsapi_articles_{date_str}.json", "w", encoding="utf-8") as f:
+            json.dump(all_articles, f, indent=2)
 
-    return cleaned_articles
+    return all_articles
 
 if __name__=="__main__":
     sample = fetch_news(query="technology")
-    for a in sample:
-        print(a["title"], "-", a["published_at"])
+    save_articles(sample)
