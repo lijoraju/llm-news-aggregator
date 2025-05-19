@@ -48,7 +48,7 @@ def fetch_news(query="AI", from_days_ago=1, language='en', page_size=10, max_pag
     if save:
         date_str = datetime.now().strftime("%Y-%m-%d")
         with open(f"../data/raw/newsapi_articles_{date_str}.json", "w", encoding="utf-8") as f:
-            json.dump(all_articles, f, indent=2)
+            json.dump(all_articles, f, indent=2, ensure_ascii=False)
 
     return all_articles
 

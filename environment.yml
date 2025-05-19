@@ -19,3 +19,4 @@ dependencies:
       - tqdm
       - python-dotenv
       - pyyaml
+      - lxml_html_clean

@@ -8,3 +8,5 @@ scikit-learn
 tqdm
 python-dotenv
 pyyaml
+lxml_html_clean
+newspaper3k
