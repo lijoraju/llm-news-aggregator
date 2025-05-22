@@ -5,14 +5,29 @@ import faiss, json
 import numpy as np
 
 from bot.user_profiles import set_user_interests, get_user_interests
+from bot.initializer import initialize_pipeline
 
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-faiss.omp_set_num_threads(1)
-index = faiss.read_index("data/processed/articles_faiss.index")
-with open("data/processed/article_metadata.json", "r") as f:
-    articles = json.load(f)
+def load_model_and_data():
+    # Ensure FAISS index and metadata are present
+    initialize_pipeline()
+    model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    faiss.omp_set_num_threads(1)
+    index = faiss.read_index("data/processed/articles_faiss.index")
+    with open("data/processed/article_metadata.json", "r") as f:
+        articles = json.load(f)
+    return model, index, articles
+
+# Lazy loading for efficiency and testability
+_model, _index, _articles = None, None, None
+
+def get_resources():
+    global _model, _index, _articles
+    if _model is None or _index is None or _articles is None:
+        _model, _index, _articles = load_model_and_data()
+    return _model, _index, _articles
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    model, index, articles = get_resources()
     user_query = update.message.text.strip()
     user_id = update.effective_user.id
     interests = get_user_interests(user_id)
@@ -24,7 +39,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     results = 0
 
     if not interests:
-        reply +="_(No preferences set – showing top articles)_\nUse /setpreferences to personalize.\n\n"
+        reply += "_(No preferences set – showing top articles)_\nUse /setpreferences to personalize.\n\n"
 
     for idx in I[0]:
         article = articles[idx]
@@ -36,12 +51,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not interests or any(interest.lower() in category.lower() for interest in interests):
             reply += f"📌 *{title}*\n"
             if category:
-                reply +=f"🏷️ Category: `{category}`\n"
+                reply += f"🏷️ Category: `{category}`\n"
             if url:
                 reply += f"🔗 [Read Full Article]({url})\n"
             reply += f"✂️ *Summary:* {summary}\n\n"
             results += 1
-            
+
         if results >= 3:
             break
 
