@@ -3,7 +3,9 @@ from telegram.ext import (
     filters
 )
 from dotenv import load_dotenv
+import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from bot.handlers import handle_message, set_preferences, show_preferences, help_command
 
 load_dotenv()
