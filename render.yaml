@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: llm-news-telegram-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python src/bot/telegram_bot.py
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
