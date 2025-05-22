@@ -27,7 +27,6 @@ newsapi-python==0.2.7
 newspaper3k==0.2.8
 nltk==3.9.1
 numpy==1.26.4
-packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1745345660/work
 pillow==11.2.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
