@@ -5,9 +5,21 @@ from telegram.ext import (
 from dotenv import load_dotenv
 import sys
 import os
+from flask import Flask
+import threading
+import asyncio
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from bot.handlers import handle_message, set_preferences, show_preferences, help_command
+
+app_web = Flask(__name__)
+
+@app_web.route("/")
+def home():
+    return "LLM Telegram Bot is running."
+
+def run_web():
+    app_web.run(host="0.0.0.0", port=10000)
 
 def load_bot_token():
     load_dotenv()
@@ -29,9 +41,14 @@ def run_bot():
     if not bot_token:
         print("❌ TELEGRAM_BOT_TOKEN not found in environment variables.")
         return
+    
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
     app = build_application(bot_token)
     print("🤖 Telegram bot is running...")
-    app.run_polling()
+    app.run_polling(stop_signals=())
 
 if __name__ == "__main__":
-    run_bot()
+    threading.Thread(target=run_bot).start()
+    run_web()
