@@ -5,7 +5,7 @@ import faiss, json
 import numpy as np
 
 from bot.user_profiles import set_user_interests, get_user_interests
-from bot.initializer import initialize_pipeline
+# from bot.initializer import initialize_pipeline
 
 def load_model_and_data():
     # Ensure FAISS index and metadata are present
