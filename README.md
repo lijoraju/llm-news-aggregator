@@ -65,7 +65,7 @@ cd llm-news-aggregator
 conda env create -f environment.yml
 conda activate llm-news
 
-# or
+# OR
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 
@@ -113,6 +113,7 @@ EC2 (tmux):
 ## 📌 Future Enhancements
  - Support user-specific long-term preferences
  - Summarize via faster LLMs (DistilBART, Pegasus)
+ - Support news articles in regional langauges
 
 ## 📝 Credits
 Developed by [Lijo Raju](https://www.linkedin.com/in/lijoraju/)
