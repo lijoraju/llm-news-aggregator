@@ -36,7 +36,7 @@ llm-news-aggregator/
 │ ├── bot/ # Telegram bot logic
 │ ├── scraping/ # NewsAPI and fulltext extraction
 │ ├── summarization/ # LLM-based summarization
-│ ├── classification/ # Zero-shot classification
+│ ├── categorization/ # Zero-shot classification
 │ ├── embedding/ # FAISS embeddings and search
 │ ├── pipeline/ # refresh_pipeline.py entry point
 │ ├── preprocessing/ # Text normalization
@@ -47,6 +47,8 @@ llm-news-aggregator/
 ├── environment.yml
 ├── requirements.txt
 ├── .env.example
+├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
