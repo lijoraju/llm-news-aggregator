@@ -12,8 +12,8 @@ def load_model_and_data():
     # initialize_pipeline()
     model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
     faiss.omp_set_num_threads(1)
-    index = faiss.read_index("data/processed/articles_faiss.index")
-    with open("data/processed/article_metadata.json", "r") as f:
+    index = faiss.read_index("server_assets/articles_faiss.index")
+    with open("server_assets/article_metadata.json", "r") as f:
         articles = json.load(f)
     return model, index, articles
 
