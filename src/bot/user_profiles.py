@@ -2,6 +2,10 @@ import json
 import os
 
 PROFILE_PATH = "data/user_profiles.json"
+SUPPORTED_CATEGORIES = [
+    "Technology", "Business", "Politics", "Sports",
+    "Health", "Science", "Entertainment", "Stock Market"
+]
 
 def load_profiles():
     if not os.path.exists(PROFILE_PATH):

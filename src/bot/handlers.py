@@ -4,7 +4,7 @@ from sentence_transformers import SentenceTransformer
 import faiss, json
 import numpy as np
 
-from bot.user_profiles import set_user_interests, get_user_interests, remove_user_preferences
+from bot.user_profiles import set_user_interests, get_user_interests, remove_user_preferences, SUPPORTED_CATEGORIES
 # from bot.initializer import initialize_pipeline
 
 def load_model_and_data():
@@ -77,6 +77,15 @@ async def set_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     interests = [i.strip() for i in text.split(",") if i.strip()]
+    invalid = [cat for cat in interests if cat not in SUPPORTED_CATEGORIES]
+
+    if invalid:
+        await update.message.reply_text(
+            f"❌ Invalid categories: {', '.join(invalid)}\n\n✅ Allowed categories are:\n" +
+            ", ".join(SUPPORTED_CATEGORIES)
+        )
+        return
+    
     set_user_interests(user_id, interests)
 
     await update.message.reply_text(f"✅ Preferences saved: {', '.join(interests)}")
