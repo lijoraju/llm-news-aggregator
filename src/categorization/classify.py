@@ -8,7 +8,7 @@ DEFAULT_LABELS = ["Technology", "Business", "Health", "Sports", "Science", "Poli
 
 def classify_articles(input_path, output_path, candidate_labels=DEFAULT_LABELS, batch_size=8):
     with open(input_path, "r", encoding="utf-8") as f:
-        articles = json.dump(f)
+        articles = json.load(f)
 
     classified = []
     summaries = [article['summary'] for article in articles]
