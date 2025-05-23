@@ -2,7 +2,7 @@ from transformers import pipeline
 from tqdm import tqdm
 import json
 
-classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli", device_map="auto")
+classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli", device= -1)
 
 DEFAULT_LABELS = ["Technology", "Business", "Health", "Sports", "Science", "Politics"]
 

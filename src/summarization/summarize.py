@@ -2,7 +2,7 @@ from transformers import pipeline
 from tqdm import tqdm
 import json
 
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device_map="auto")
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device= -1)
 
 def summarize_articles(input_path, output_path, batch_size=8, max_input_tokens=1024):
     with open(input_path, "r", encoding="utf-8") as f:
