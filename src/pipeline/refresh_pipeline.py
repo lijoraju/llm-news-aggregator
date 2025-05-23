@@ -19,7 +19,7 @@ def run_pipeline():
     summarized_file = f"data/processed/summarized_{date_str}.json"
     tagged_file = f"data/processed/tagged_{date_str}.json"
     
-    _ = fetch_news(query="AI", max_pages=5, save=True)
+    _ = fetch_news(max_pages=5, save=True)
     extract_full_articles(raw_file, fulltext_file)
     preprocess_articles(fulltext_file, cleaned_file)
     summarize_articles(cleaned_file, summarized_file)
