@@ -65,6 +65,10 @@ cd llm-news-aggregator
 conda env create -f environment.yml
 conda activate llm-news
 
+# or
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
 # Add your API keys
 cp .env.example .env
 # Then edit .env and set:
@@ -107,7 +111,6 @@ EC2 (tmux):
 ```
 
 ## 📌 Future Enhancements
- - Add secure Cloudflare Tunnel for GitHub → EC2 upload
  - Support user-specific long-term preferences
  - Summarize via faster LLMs (DistilBART, Pegasus)
 
