@@ -45,7 +45,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         article = articles[idx]
         category = article.get("category", "")
         title = article.get("title", "Untitled")
-        summary = article.get("summary", "")[:300] + "..."
+        summary = article.get("summary", "")
         url = article.get("url", "")
 
         if not interests or any(interest.lower() in category.lower() for interest in interests):
