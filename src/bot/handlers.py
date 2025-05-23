@@ -4,7 +4,7 @@ from sentence_transformers import SentenceTransformer
 import faiss, json
 import numpy as np
 
-from bot.user_profiles import set_user_interests, get_user_interests
+from bot.user_profiles import set_user_interests, get_user_interests, remove_user_preferences
 # from bot.initializer import initialize_pipeline
 
 def load_model_and_data():
@@ -101,3 +101,12 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "`/help` to show this message again"
     )
     await update.message.reply_markdown(msg)
+
+async def remove_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    success = remove_user_preferences(user_id)
+
+    if success:
+        await update.message.reply_text("✅ Your preferences have been removed. You can set new ones with /setpreferences.")
+    else:
+        await update.message.reply_text("ℹ️ You don’t have any preferences set yet.")
