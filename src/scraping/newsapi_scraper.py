@@ -46,6 +46,7 @@ def fetch_news(query="AI", from_days_ago=1, language='en', page_size=10, max_pag
             print(f"Error on page {page}: {e}")
     
     if save:
+        Path("data/raw").mkdir(parents=True, exist_ok=True)
         date_str = datetime.now().strftime("%Y-%m-%d")
         with open(f"data/raw/newsapi_{date_str}.json", "w", encoding="utf-8") as f:
             json.dump(all_articles, f, indent=2, ensure_ascii=False)
