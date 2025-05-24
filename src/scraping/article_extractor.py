@@ -16,7 +16,7 @@ def extract_full_articles(input_path, output_path):
             news_article.parse()
             full_text = news_article.text.strip()
 
-            if full_text and len(full_text) > 50:
+            if full_text and len(full_text) >= 150:
                 article['content'] = full_text
                 enriched_articles.append(article)
         

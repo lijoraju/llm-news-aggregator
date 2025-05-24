@@ -15,7 +15,7 @@ def normalize_text(text):
     text = re.sub(r'\.(?=[A-Za-z])', '. ', text)
     return text.strip()
 
-def preprocess_articles(input_path, output_path, min_words=50):
+def preprocess_articles(input_path, output_path, min_words=150):
     with open(input_path, "r", encoding="utf-8") as f:
         articles = json.load(f)
     

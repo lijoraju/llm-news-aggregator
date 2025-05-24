@@ -14,7 +14,7 @@ def summarize_articles(input_path, output_path, batch_size=8, max_input_tokens=1
 
     for idx, article in enumerate(articles):
         text = article['content']
-        if len(text.split()) >= 50:
+        if len(text.split()) >= 150:
             valid_indices.append(idx)
             valid_texts.append(text[:max_input_tokens])
 
