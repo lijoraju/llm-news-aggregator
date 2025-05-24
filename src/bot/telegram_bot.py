@@ -25,7 +25,7 @@ def register_handlers(app):
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("removepreferences", remove_preferences))
-    app.app_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("start", start))
 
 def run_bot():
     bot_token = load_bot_token()
