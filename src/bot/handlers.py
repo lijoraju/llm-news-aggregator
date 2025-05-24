@@ -3,8 +3,10 @@ from telegram.ext import ContextTypes
 from sentence_transformers import SentenceTransformer
 import faiss, json
 import numpy as np
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.user_profiles import set_user_interests, get_user_interests, remove_user_preferences, SUPPORTED_CATEGORIES
+from bot.user_profiles import (set_user_interests, get_user_interests, remove_user_preferences, 
+                               SUPPORTED_CATEGORIES, load_profiles)
 # from bot.initializer import initialize_pipeline
 
 def load_model_and_data():
@@ -103,12 +105,16 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🤖 *Welcome to SmartNews Bot!*\n\n"
         "Here's what I can do:\n"
         "• Send me a message like `AI in healthcare`\n"
-        "• I'll send you summaries of relevant news articles\n\n"
-        "💡 Personalize your feed:\n"
-        "`/setpreferences Technology, Health`\n"
-        "`/preferences` to see your current preferences\n"
-        "`/help` to show this message again"
+        "• I’ll send you relevant summaries from recent news articles\n\n"
+        "📌 *Available Commands:*\n"
+        "`/setpreferences Technology, Health` – Set your preferred categories\n"
+        "`/preferences` – View your current preferences\n"
+        "`/removepreferences` – Clear your preferences\n"
+        "`/help` – Show this help message\n\n"
+        "✅ *Supported Categories:*\n"
+        "Technology, Business, Politics, Sports, Health, Science, Entertainment, Stock Market"
     )
+
     await update.message.reply_markdown(msg)
 
 async def remove_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -119,3 +125,24 @@ async def remove_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.message.reply_text("✅ Your preferences have been removed. You can set new ones with /setpreferences.")
     else:
         await update.message.reply_text("ℹ️ You don’t have any preferences set yet.")
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    msg = (
+        f"👋 Hi {user.first_name or 'there'}!\n\n"
+        "Welcome to *SmartNews Bot* – your personalized LLM-powered news assistant.\n\n"
+        "You can:\n"
+        "• Send me a message like `AI in finance`\n"
+        "• Set preferences for the type of news you want\n\n"
+        "⚙️ Use the buttons below or `/help` for all commands."
+    )
+
+    prefs = load_profiles()
+    user_id_str = str(user.id)
+
+    keyboard = []
+    if user_id_str not in prefs:
+        keyboard = [[InlineKeyboardButton("Set Preferences", callback_data="set_preferences")]]
+
+    reply_markup = InlineKeyboardMarkup(keyboard) if keyboard else None
+    await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=reply_markup)

@@ -7,7 +7,8 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from bot.handlers import handle_message, set_preferences, show_preferences, help_command, remove_preferences
+from bot.handlers import (handle_message, set_preferences, show_preferences, 
+                          help_command, remove_preferences, start)
 
 def load_bot_token():
     load_dotenv()
@@ -24,6 +25,7 @@ def register_handlers(app):
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("removepreferences", remove_preferences))
+    app.app_handler(CommandHandler("start", start))
 
 def run_bot():
     bot_token = load_bot_token()
