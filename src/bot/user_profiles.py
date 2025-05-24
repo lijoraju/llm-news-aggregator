@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 PROFILE_PATH = "data/user_profiles.json"
 SUPPORTED_CATEGORIES = [
@@ -14,6 +15,7 @@ def load_profiles():
         return json.load(f)
     
 def save_profiles(profiles):
+    Path(PROFILE_PATH).parent.mkdir(parents=True, exist_ok=True)
     with open(PROFILE_PATH, "w") as f:
         json.dump(profiles, f, indent=2)
 
