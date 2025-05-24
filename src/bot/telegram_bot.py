@@ -26,7 +26,7 @@ def register_handlers(app):
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("removepreferences", remove_preferences))
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(handle_button))
+    app.add_handler(CallbackQueryHandler(handle_button, pattern="^(load_more|set_preferences)$"))
 
 def run_bot():
     bot_token = load_bot_token()

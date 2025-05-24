@@ -9,6 +9,8 @@ from bot.user_profiles import (set_user_interests, get_user_interests, remove_us
                                SUPPORTED_CATEGORIES, load_profiles)
 # from bot.initializer import initialize_pipeline
 
+user_sessions = {}
+
 def load_model_and_data():
     # Ensure FAISS index and metadata are present
     # initialize_pipeline()
@@ -28,44 +30,80 @@ def get_resources():
         _model, _index, _articles = load_model_and_data()
     return _model, _index, _articles
 
+def store_user_results(user_id, results):
+    user_sessions[user_id] = {
+        "results": results,
+        "index": 0
+    }
+
+def get_next_results(user_id, batch_size=3):
+    session = user_sessions.get(user_id)
+    if not session:
+        return [], False
+    start = session["index"]
+    end = start + batch_size
+    next_batch = session["results"][start:end]
+    session["index"] = end
+
+    has_more = session["index"] < len(session["results"])
+
+    if not has_more:
+        user_sessions.pop(user_id, None)
+
+    return next_batch, has_more
+
+def format_article_summary(article):
+    category = article.get("category", "")
+    title = article.get("title", "Untitled")
+    summary = article.get("summary", "")
+    url = article.get("url", "")
+
+    text = f"📌 *{title}*\n"
+    if category:
+        text += f"🏷️ Category: `{category}`\n"
+    if url:
+        text += f"🔗 [Read Full Article]({url})\n"
+    text += f"✂️ *Summary:* {summary}\n\n"
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     model, index, articles = get_resources()
     user_query = update.message.text.strip()
     user_id = update.effective_user.id
-    interests = get_user_interests(user_id)
 
     query_vec = model.encode([user_query])
     D, I = index.search(np.array(query_vec).astype("float32"), k=10)
 
     reply = f"🧠 *Results for:* _{user_query}_\n\n"
-    results = 0
+    results = []
 
-    if not interests:
-        reply += "_(No preferences set – showing top articles)_\nUse /setpreferences to personalize.\n\n"
+    # if not interests:
+    #     reply += "_(No preferences set – showing top articles)_\nUse /setpreferences to personalize.\n\n"
+
 
     for idx in I[0]:
-        article = articles[idx]
-        category = article.get("category", "")
-        title = article.get("title", "Untitled")
-        summary = article.get("summary", "")
-        url = article.get("url", "")
+        results.append(articles[idx])
 
-        if not interests or any(interest.lower() in category.lower() for interest in interests):
-            reply += f"📌 *{title}*\n"
-            if category:
-                reply += f"🏷️ Category: `{category}`\n"
-            if url:
-                reply += f"🔗 [Read Full Article]({url})\n"
-            reply += f"✂️ *Summary:* {summary}\n\n"
-            results += 1
+    if not results:
+        await update.message.reply_text("⚠️ Sorry, I couldn't find any relevant news.")
+        return
 
-        if results >= 3:
-            break
+    store_user_results(user_id, results)
+    first_batch, has_more = get_next_results(user_id)
 
-    if results == 0:
+    for article in first_batch:
+        reply += format_article_summary(article)
+
+    if len(first_batch) == 0:
         reply += "⚠️ No results matched your preferences."
 
     await update.message.reply_markdown(reply[:4096])
+
+    if has_more:
+        await update.message.reply_text(
+            "Want more?",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Show More Results", callback_data="load_more")
+]])
+        )
 
 async def set_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -151,9 +189,29 @@ async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
+    user_id = query.from_user.id
+
     if query.data == "set_preferences":
         await query.edit_message_text(
             "📝 To set your preferences, send:\n\n"
             "`/setpreferences Technology, Health`",
             parse_mode="Markdown"
         )
+    elif query.data == "load_more":
+        next_batch, has_more = get_next_results(user_id)
+
+        if not next_batch:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="✅ You've seen all results.")
+            return
+        
+        for article in next_batch:
+            msg = format_article_summary(article)
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode="Markdown")
+        
+        if has_more:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="Want more?",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Show More Results", callback_data="load_more")
+]])
+            )
