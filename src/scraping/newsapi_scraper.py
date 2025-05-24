@@ -14,7 +14,7 @@ def save_articles(articles, output_path="data/raw/newsapi_articles.json"):
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(articles, f, indent=2, ensure_ascii=False)
 
-def fetch_news(query="top headlines", from_days_ago=1, language='en', page_size=20, max_pages=3, save=False):
+def fetch_news(query="trending news", from_days_ago=2, language='en', page_size=20, max_pages=3, save=False):
     from_date = (datetime.now() - timedelta(days=from_days_ago)).strftime('%Y-%m-%d')
     all_articles = []
 
