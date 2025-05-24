@@ -146,3 +146,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     reply_markup = InlineKeyboardMarkup(keyboard) if keyboard else None
     await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=reply_markup)
+
+async def handle_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == "set_preferences":
+        await query.edit_message_text(
+            "📝 To set your preferences, send:\n\n"
+            "`/setpreferences Technology, Health`",
+            parse_mode="Markdown"
+        )
