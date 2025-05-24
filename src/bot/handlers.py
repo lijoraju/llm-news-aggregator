@@ -10,6 +10,7 @@ from bot.user_profiles import (set_user_interests, get_user_interests, remove_us
 # from bot.initializer import initialize_pipeline
 
 user_sessions = {}
+GENERIC_KEYWORDS = {"news", "latest", "today", "top", "headlines"}
 
 def load_model_and_data():
     # Ensure FAISS index and metadata are present
@@ -65,23 +66,43 @@ def format_article_summary(article):
         text += f"🔗 [Read Full Article]({url})\n"
     text += f"✂️ *Summary:* {summary}\n\n"
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def search_articles(user_query):
     model, index, articles = get_resources()
-    user_query = update.message.text.strip()
-    user_id = update.effective_user.id
-
     query_vec = model.encode([user_query])
+    search_results = []
+
     D, I = index.search(np.array(query_vec).astype("float32"), k=10)
 
-    reply = f"🧠 *Results for:* _{user_query}_\n\n"
-    results = []
+    for idx in I[0]:
+        search_results.append(articles[idx])
 
+    return search_results
+
+def load_summaries_by_categories(interests):
+    _, _, articles = get_resources()
+    summaries = []
+
+    for article in articles:
+        if article.get("category", "") in interests:
+            summaries.append(article)
+            if len(summaries) == 30:
+                break
+                
+    return summaries
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_query = update.message.text.strip()
+    user_id = update.effective_user.id
+    interests = get_user_interests(user_id)
+    use_preferences = (not user_query) or (user_query.lower() in GENERIC_KEYWORDS)
+
+    if use_preferences and interests:
+        results = load_summaries_by_categories(interests)
+    else:
+        results = search_articles(user_query)
+    
     # if not interests:
     #     reply += "_(No preferences set – showing top articles)_\nUse /setpreferences to personalize.\n\n"
-
-
-    for idx in I[0]:
-        results.append(articles[idx])
 
     if not results:
         await update.message.reply_text("⚠️ Sorry, I couldn't find any relevant news.")
@@ -89,6 +110,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     store_user_results(user_id, results)
     first_batch, has_more = get_next_results(user_id)
+
+    reply = f"🧠 *Results for:* _{user_query}_\n\n"
 
     for article in first_batch:
         reply += format_article_summary(article)
