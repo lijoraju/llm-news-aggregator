@@ -66,6 +66,8 @@ def format_article_summary(article):
         text += f"🔗 [Read Full Article]({url})\n"
     text += f"✂️ *Summary:* {summary}\n\n"
 
+    return text
+
 def search_articles(user_query):
     model, index, articles = get_resources()
     query_vec = model.encode([user_query])
@@ -87,7 +89,7 @@ def load_summaries_by_categories(interests):
             summaries.append(article)
             if len(summaries) == 30:
                 break
-                
+
     return summaries
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
